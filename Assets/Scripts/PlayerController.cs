@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
 public class PlayerController : MonoBehaviour {
 
@@ -10,8 +12,10 @@ public class PlayerController : MonoBehaviour {
 	public GUIText scoreText;
 
 	private Rigidbody rBody;
-	private float maxDistance = 0.0f;
 	private bool gameIsOver = false;
+	private float score = 0;
+	private float maxDistance = 0.0f;
+	List<PickupObject> pickups = new List<PickupObject> ();
 
 	void Start()
 	{
@@ -30,10 +34,10 @@ public class PlayerController : MonoBehaviour {
 		if (!gameIsOver) 
 		{
 			// Move o jogador na horizontal
-			rBody.position = new Vector3 (
-			Mathf.Clamp (rBody.position.x, -4.2f, 4.2f), 
-			rBody.position.y, 
-			rBody.position.z
+			rBody.position.Set(
+				Mathf.Clamp (rBody.position.x, -4.2f, 4.2f), 
+				rBody.position.y, 
+				rBody.position.z
 			);
 
 			// Verifica se o jogador saiu de vista
@@ -43,10 +47,29 @@ public class PlayerController : MonoBehaviour {
 
 			// Atualiza pontuaçao
 			float distance = Vector3.Distance (GetComponent<Transform> ().position, floor.transform.position);
-			if (distance > maxDistance)
+			if (distance > maxDistance){
 				maxDistance = distance;
-			scoreText.text = Mathf.FloorToInt (maxDistance * 100) + " pts.";
+			}
+
+			CalculaScore();
+			ExibeScore();
 		}	
+	}
+
+	private void ExibeScore()
+	{
+		scoreText.text = Mathf.FloorToInt (score) + " pts.";
+	}
+
+	private void CalculaScore()
+	{
+		int scoreDistancia = Mathf.FloorToInt(maxDistance * 100);
+		int scorePickups = 0;
+		foreach (var pickup in pickups) {
+			scorePickups += pickup.TotalScore();
+			Debug.Log(pickup.Type.ToString() + ":" + pickup.TotalScore());
+		}
+		score = scoreDistancia + scorePickups;
 	}
 
 	private void GameOver()
@@ -60,9 +83,28 @@ public class PlayerController : MonoBehaviour {
 	{
 		if (!gameIsOver) 
 		{
+			string otherTag = other.gameObject.tag;
 			bool isUnderPlayer = other.gameObject.transform.position.y < rBody.position.y;
-			if (other.gameObject.tag.Equals ("Platform") && isUnderPlayer) {
+			if (otherTag.Equals ("Platform") && isUnderPlayer) 
+			{
 				Jump ();
+			}
+			else if(otherTag.Equals("Coin"))
+			{
+				CoinBehavior coinBehavior = (CoinBehavior)other.gameObject.GetComponent<CoinBehavior>();
+				var coin = coinBehavior.Pegar();
+				if(coin != null)
+				{
+					if(pickups.Select(po => po.Type).Contains(coin.Type))
+					{
+						var coinPickup = pickups.Find(po => po.Type == PickupType.Coin);
+						coinPickup.Quantity += coin.Quantity;
+					}
+					else 
+					{
+						pickups.Add(coin);
+					}
+				}
 			}
 		}
 	}
