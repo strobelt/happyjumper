@@ -25,6 +25,15 @@ public class CoinBehavior : MonoBehaviour {
 		}
 	}
 
+	void OnTriggerEnter(Collider other)
+	{
+		string otherTag = other.gameObject.tag;
+		if (otherTag.Equals ("Platform")) 
+		{
+			Destroy(this.gameObject);
+		}
+	}
+
 	public PickupObject Pegar()
 	{
 		if (!pego) {
