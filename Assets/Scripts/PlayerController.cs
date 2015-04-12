@@ -67,7 +67,7 @@ public class PlayerController : MonoBehaviour {
 		int scorePickups = 0;
 		foreach (var pickup in pickups) {
 			scorePickups += pickup.TotalScore();
-			Debug.Log(pickup.Type.ToString() + ":" + pickup.TotalScore());
+			//Debug.Log(pickup.Type.ToString() + ":" + pickup.TotalScore());
 		}
 		score = scoreDistancia + scorePickups;
 	}
@@ -84,7 +84,13 @@ public class PlayerController : MonoBehaviour {
 		if (!gameIsOver) 
 		{
 			string otherTag = other.gameObject.tag;
-			bool isUnderPlayer = other.gameObject.transform.position.y < rBody.position.y;
+			float thisBottomY = (this.gameObject.transform.position.y);
+			float otherTopY = (other.gameObject.transform.position.y + 
+			                   other.bounds.extents.y);
+			//Debug.Log("BY:" + thisBottomY);
+			//Debug.Log("PP:" + other.gameObject.transform.position.y);
+			Debug.Log("POY:" + other.bounds.extents.y);
+			bool isUnderPlayer =  thisBottomY >= otherTopY;
 			if (otherTag.Equals ("Platform") && isUnderPlayer) 
 			{
 				Jump ();
