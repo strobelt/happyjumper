@@ -34,7 +34,7 @@ public class PlayerController : MonoBehaviour {
 		if (!gameIsOver) 
 		{
 			// Move o jogador na horizontal
-			rBody.position.Set(
+			rBody.position = new Vector3(
 				Mathf.Clamp (rBody.position.x, -4.2f, 4.2f), 
 				rBody.position.y, 
 				rBody.position.z
@@ -118,7 +118,8 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	private bool CanIBeSeen() {
-		
+		//if (Debug.isDebugBuild)	return true;
+
 		Plane[] planes = GeometryUtility.CalculateFrustumPlanes(mainCamera);		
 		
 		if (GeometryUtility.TestPlanesAABB(planes , GetComponent<Collider>().bounds))

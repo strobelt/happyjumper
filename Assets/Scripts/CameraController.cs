@@ -8,6 +8,7 @@ public class CameraController : MonoBehaviour {
 
 	private Transform transf;
 	private float playerHeight;
+	private float maxPlayerHeight;
 
 	void Start () {
 		transf = GetComponent<Transform> ();
@@ -16,7 +17,10 @@ public class CameraController : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		playerHeight = player.transform.position.y + yOffset;
-		if(playerHeight > transf.position.y)
+		if (playerHeight > maxPlayerHeight)
+			maxPlayerHeight = playerHeight;
+		
+		if(playerHeight > transf.position.y || maxPlayerHeight - playerHeight < yOffset)
 			transf.position = new Vector3(
 				transf.position.x,
 				playerHeight,
