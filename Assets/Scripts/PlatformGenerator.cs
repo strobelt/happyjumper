@@ -8,7 +8,7 @@ public class PlatformGenerator : MonoBehaviour {
 	public Camera mainCamera;
 
 	public float maxPlatformXSpacementFromLast = 5f;
-	public float platformYSpacement = 1.5f;
+	public float platformYSpacement = 1f;
 	public float coinChance = 0.6f;
 	public float startingHeight = 2;
 	public float coinOffset = 0.7f;

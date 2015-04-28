@@ -24,17 +24,16 @@ public class PlayerController : MonoBehaviour {
 
 	void FixedUpdate()
 	{
-		float horizontalMovement = Input.GetAxis ("Horizontal") * 150f * Time.deltaTime;
+		float horizontalMovement = Input.GetAxis ("Horizontal") * 250f * Time.deltaTime;
 		Vector3 movement = new Vector3 (horizontalMovement, 0.0f, 0.0f);
 		rBody.AddForce (movement);
 	}
 
 	void Update()
 	{
-		if (!gameIsOver) 
-		{
+		if (!gameIsOver) {
 			// Move o jogador na horizontal
-			rBody.position = new Vector3(
+			rBody.position = new Vector3 (
 				Mathf.Clamp (rBody.position.x, -4.2f, 4.2f), 
 				rBody.position.y, 
 				rBody.position.z
@@ -47,13 +46,17 @@ public class PlayerController : MonoBehaviour {
 
 			// Atualiza pontuaçao
 			float distance = Vector3.Distance (GetComponent<Transform> ().position, floor.transform.position);
-			if (distance > maxDistance){
+			if (distance > maxDistance) {
 				maxDistance = distance;
 			}
 
-			CalculaScore();
-			ExibeScore();
-		}	
+			CalculaScore ();
+			ExibeScore ();
+		}
+		else
+		{
+			rBody.transform.Rotate (Vector3.right * 180 * Time.deltaTime);
+		}
 	}
 
 	private void ExibeScore()
@@ -74,6 +77,7 @@ public class PlayerController : MonoBehaviour {
 
 	private void GameOver()
 	{
+		rBody.velocity = Vector3.zero;
 		centerText.text = "Game Over :(\n" + scoreText.text;
 		scoreText.text = "";
 		gameIsOver = true;
@@ -89,7 +93,7 @@ public class PlayerController : MonoBehaviour {
 			                   other.bounds.extents.y);
 			//Debug.Log("BY:" + thisBottomY);
 			//Debug.Log("PP:" + other.gameObject.transform.position.y);
-			Debug.Log("POY:" + other.bounds.extents.y);
+			//Debug.Log("POY:" + other.bounds.extents.y);
 			bool isUnderPlayer =  thisBottomY >= otherTopY;
 			if (otherTag.Equals ("Platform") && isUnderPlayer) 
 			{
@@ -111,6 +115,9 @@ public class PlayerController : MonoBehaviour {
 						pickups.Add(coin);
 					}
 				}
+			}
+			else if(otherTag.Equals("Enemy")){
+				GameOver();
 			}
 		}
 	}
