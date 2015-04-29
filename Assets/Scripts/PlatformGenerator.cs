@@ -5,16 +5,26 @@ public class PlatformGenerator : MonoBehaviour {
 
 	public GameObject platformPrefab;
 	public GameObject coinPrefab;
+	public GameObject enemyPrefab;
 	public Camera mainCamera;
 
 	public float maxPlatformXSpacementFromLast = 5f;
-	public float platformYSpacement = 1f;
-	public float coinChance = 0.6f;
+	public float platformMaxYSpacement = 1f;
+	public float platformMinYSpacement = 0.8f;
 	public float startingHeight = 2;
 	public float coinOffset = 0.7f;
+	public float coinChance = 0.6f;
+	public float enemyOffset = 0.7f;
+	public float enemyChance = 0.8f;
+	public int minimumPlatformsBetweenEnemies = 6;
+	public float enemyMovementSpace = 2f;
 
 	private GameObject lastPlatform;
 	private bool lastHadCoin = false;
+	private bool lastHadEnemy = false;
+	private int platformsBetweenEnemies = 0;
+
+	private float minPlatformXPosition = -4f, maxPlatformXPosition = 4f;
 
 	// Use this for initialization
 	void Start () {
@@ -29,7 +39,7 @@ public class PlatformGenerator : MonoBehaviour {
 
 			this.gameObject.transform.position = new Vector3(
 				this.gameObject.transform.position.x,
-				this.gameObject.transform.position.y + platformYSpacement,
+				this.gameObject.transform.position.y + platformMaxYSpacement,
 				this.gameObject.transform.position.z
 				);
 		}
@@ -40,33 +50,96 @@ public class PlatformGenerator : MonoBehaviour {
 		float x, y;
 		bool hasCoin = Random.value >= coinChance;
 
+		#region Platform and coin spawning
 		if (lastPlatform == null) {
-			x = Random.value * 8 - 4;
+			x = Random.value * (maxPlatformXPosition * 2 - minPlatformXPosition);
 		} else {
 			x = lastPlatform.transform.position.x + 
 				(Random.value * (2 * maxPlatformXSpacementFromLast) - maxPlatformXSpacementFromLast);
-			x = Mathf.Clamp (x, -4f, 4f);
+			x = Mathf.Clamp (x, minPlatformXPosition, maxPlatformXPosition);
 		}
 
 		y = this.gameObject.transform.position.y + 
-			(Random.value * platformYSpacement - platformYSpacement);
+			(Random.value * (platformMaxYSpacement - platformMinYSpacement) - platformMinYSpacement);
 
-		if (lastPlatform != null &&
-			lastHadCoin  &&
-		    (y - lastPlatform.transform.position.y) < (coinOffset + 0.1f) &&
-		    Mathf.Abs ((x - lastPlatform.transform.position.x)) < lastPlatform.GetComponent<Renderer> ().bounds.size.x) 
-		{
-			y += lastPlatform.transform.position.y + coinOffset + 0.1f;
+		if (lastPlatform != null){
+			/*
+			if(lastHadCoin && lastHadEnemy &&
+			   (y - lastPlatform.transform.position.y) < (Mathf.Max(coinOffset, enemyOffset) + 0.1f) &&
+			   Mathf.Abs ((x - lastPlatform.transform.position.x)) < lastPlatform.GetComponent<Renderer> ().bounds.size.x)
+			{
+				y += lastPlatform.transform.position.y + Mathf.Max(coinOffset, enemyOffset) + 0.1f;
+			}
+			else if(lastHadCoin  &&
+				   (y - lastPlatform.transform.position.y) < (coinOffset + 0.1f) 
+			        //&& Mathf.Abs ((x - lastPlatform.transform.position.x)) < lastPlatform.GetComponent<Renderer> ().bounds.size.x
+			        ) 
+			{
+				y += lastPlatform.transform.position.y + coinOffset + 0.1f;
+			}
+			else if(lastHadEnemy  &&
+				   (y - lastPlatform.transform.position.y) < (enemyOffset + 0.1f) 
+			        //&& Mathf.Abs ((x - lastPlatform.transform.position.x)) < lastPlatform.GetComponent<Renderer> ().bounds.size.x
+			        ) 
+			{
+				y += lastPlatform.transform.position.y + enemyOffset + 0.1f;
+			}
+			
+			if((lastHadCoin || lastHadEnemy) && 
+			   (y - lastPlatform.transform.position.y) < platformMinYSpacement)
+			{
+				y = lastPlatform.transform.position.y + platformMinYSpacement;
+			}
+			*/
 		}
-		
-		lastHadCoin = hasCoin;
+
+
 		lastPlatform = (GameObject)Instantiate (platformPrefab, new Vector3 (x, y, 0), Quaternion.identity);
 
-		if (hasCoin)
+		if (hasCoin){
 			Instantiate (coinPrefab, new Vector3 (
 				lastPlatform.transform.position.x,
 				lastPlatform.transform.position.y + coinOffset,
 				lastPlatform.transform.position.z), Quaternion.identity);
+			lastHadCoin = true;
+		}
+		else
+		{
+			lastHadCoin = false;
+		}
+		#endregion
+
+		#region Enemy Spawning
+		bool hasEnemy = platformsBetweenEnemies >= minimumPlatformsBetweenEnemies && Random.value >= enemyChance;
+
+		if(hasEnemy){
+
+			float enemyXPosition;
+
+			if(lastPlatform.transform.position.x >= maxPlatformXPosition / 2)
+			{
+				enemyXPosition = lastPlatform.transform.position.x - enemyMovementSpace;
+			}
+			else
+			{
+				enemyXPosition = lastPlatform.transform.position.x + enemyMovementSpace;
+			}
+
+			Instantiate(enemyPrefab, new Vector3(
+				enemyXPosition,
+				lastPlatform.transform.position.y,
+				lastPlatform.transform.position.z), Quaternion.identity);
+
+			platformsBetweenEnemies = 0;
+			lastHadEnemy = true;
+		}
+		else 
+		{
+			platformsBetweenEnemies++;
+			lastHadEnemy = false;
+		}
+
+		#endregion
 	}
 	
 	private bool CanIBeSeen() {
