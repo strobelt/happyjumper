@@ -88,13 +88,11 @@ public class PlayerController : MonoBehaviour {
 		if (!gameIsOver) 
 		{
 			string otherTag = other.gameObject.tag;
-			float thisBottomY = (this.gameObject.transform.position.y);
-			float otherTopY = (other.gameObject.transform.position.y + 
-			                   other.bounds.extents.y);
-			//Debug.Log("BY:" + thisBottomY);
-			//Debug.Log("PP:" + other.gameObject.transform.position.y);
-			//Debug.Log("POY:" + other.bounds.extents.y);
-			bool isUnderPlayer =  thisBottomY >= otherTopY;
+			// Vetor que aponta *DESTE* objeto (this) *PARA* o com qual colidiu (other)
+			Vector3 heading = other.transform.position - this.transform.position;
+			Debug.Log("Direction" + heading.ToString());
+			Debug.Log("Distance" + heading.sqrMagnitude); // Distancia simples, sem raiz inversa para agilizar o processo
+			bool isUnderPlayer =  heading.y < -0.1f && Mathf.Abs(heading.x) < other.bounds.size.x - 0.1f;
 			if (otherTag.Equals ("Platform") && isUnderPlayer) 
 			{
 				Jump ();
