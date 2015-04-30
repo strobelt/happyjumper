@@ -64,29 +64,21 @@ public class PlatformGenerator : MonoBehaviour {
 
 		if (lastPlatform != null){
 
-			if(lastHadCoin && lastHadEnemy &&
-			   (y - lastPlatform.transform.position.y) < (Mathf.Max(coinOffset, enemyOffset) + 0.1f) &&
-			   Mathf.Abs ((x - lastPlatform.transform.position.x)) < lastPlatform.GetComponent<Renderer> ().bounds.size.x)
+			if(lastHadCoin && lastHadEnemy && 
+			   (y - lastPlatform.transform.position.y) < (Mathf.Max(coinOffset, enemyOffset) + 0.1f))
 			{
 				y += lastPlatform.transform.position.y + Mathf.Max(coinOffset, enemyOffset) + 0.1f;
 			}
-			else if(lastHadCoin  &&
-				   (y - lastPlatform.transform.position.y) < (coinOffset + 0.1f) 
-			        //&& Mathf.Abs ((x - lastPlatform.transform.position.x)) < lastPlatform.GetComponent<Renderer> ().bounds.size.x
-			        ) 
+			else if(lastHadCoin && (y - lastPlatform.transform.position.y) < (coinOffset + 0.1f)) 
 			{
 				y += lastPlatform.transform.position.y + coinOffset + 0.1f;
 			}
-			else if(lastHadEnemy  &&
-				   (y - lastPlatform.transform.position.y) < (enemyOffset + 0.1f) 
-			        //&& Mathf.Abs ((x - lastPlatform.transform.position.x)) < lastPlatform.GetComponent<Renderer> ().bounds.size.x
-			        ) 
+			else if(lastHadEnemy && (y - lastPlatform.transform.position.y) < (enemyOffset + 0.1f)) 
 			{
-				y += lastPlatform.transform.position.y + enemyOffset + 0.1f;
+				y += lastPlatform.transform.position.y + enemyOffset + 0.2f;
 			}
 			
-			if((lastHadCoin || lastHadEnemy) && 
-			   (y - lastPlatform.transform.position.y) < platformMinYSpacement)
+			if((lastHadCoin || lastHadEnemy) && (y - lastPlatform.transform.position.y) < platformMinYSpacement)
 			{
 				y = lastPlatform.transform.position.y + platformMinYSpacement;
 			}

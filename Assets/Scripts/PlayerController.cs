@@ -89,6 +89,7 @@ public class PlayerController : MonoBehaviour {
 		{
 			string otherTag = other.gameObject.tag;
 			// Vetor que aponta *DESTE* objeto (this) *PARA* o com qual colidiu (other)
+			// http://docs.unity3d.com/Manual/DirectionDistanceFromOneObjectToAnother.html
 			Vector3 heading = other.transform.position - this.transform.position;
 			Debug.Log("Direction" + heading.ToString());
 			Debug.Log("Distance" + heading.sqrMagnitude); // Distancia simples, sem raiz inversa para agilizar o processo
